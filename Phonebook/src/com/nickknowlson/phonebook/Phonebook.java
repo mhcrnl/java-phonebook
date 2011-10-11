@@ -1,11 +1,19 @@
 package com.nickknowlson.phonebook;
 
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.io.Serializable;
 
-public class Phonebook extends ArrayList<Person> {
+public class Phonebook extends ArrayList<Person> implements Serializable {
 	
 	private static final long serialVersionUID = -6824316704912481869L;
 
@@ -13,8 +21,22 @@ public class Phonebook extends ArrayList<Person> {
 	public Phonebook(Collection<Person> listOfPeople) {
 		super(listOfPeople);
 	}
-
+	
 	// public methods
+	public void save(String filename) {
+		FileOutputStream fos = null;
+		ObjectOutputStream out = null;
+		//BufferedWriter bufferedWriter = null;
+		try {
+			fos = new FileOutputStream(filename);
+			out = new ObjectOutputStream(fos);
+			out.writeObject(this);
+			out.close();
+		} catch (Exception e) {
+			System.err.println("Error: phonebook could not be saved to " + filename + ". Message: " + e.getMessage());
+		}
+	}
+
 	public Person findPersonWithLastName(String string) {
 		// TODO Auto-generated method stub
 		return null;
@@ -41,6 +63,27 @@ public class Phonebook extends ArrayList<Person> {
 		return randomListOfPeople;
 	}
 	
+	public static Phonebook load(String filename) {
+		FileInputStream fis = null;
+		ObjectInputStream in = null;
+		
+		List<Person> phonebook = null;
+		
+		try {
+			fis = new FileInputStream(filename);
+			in = new ObjectInputStream(fis);
+			phonebook = (ArrayList<Person>) in.readObject();
+			in.close();
+		} catch (IOException ex) {
+			System.err.println("Couldn't load " + filename + ". Error: " + ex.getMessage());
+			ex.printStackTrace();
+		} catch (ClassNotFoundException ex) {
+			ex.printStackTrace();
+		}
+		
+		return new Phonebook(phonebook);
+	}
+	
 	// private methods
 	private static Person generateRandomPerson() {
 		String firstName = randomName();
@@ -53,7 +96,7 @@ public class Phonebook extends ArrayList<Person> {
 	
 	private static List<PhoneNumber> randomPhoneNumbers() {
 		
-		int numOfPhoneNumbers = new Random().nextInt(3);
+		int numOfPhoneNumbers = new Random().nextInt(4);
 		
 		List<PhoneNumber> phoneNumbers = new ArrayList<PhoneNumber>();
 		
