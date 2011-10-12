@@ -63,20 +63,22 @@ public class Main {
 					switch (number) {
 					case 1:
 						System.out.print("Please enter a last name to search for: ");
-						String lastName = "";
+						String lastNameToFind = "";
 						try {
-							lastName = br.readLine().trim();
+							lastNameToFind = br.readLine().trim();
 						} catch (IOException ioe) {
 							System.err.println("IO error trying to read your choice!");
 							System.exit(1);
 						}
 						
-						Person personFromLastname = phonebook.findPersonWithLastName(lastName);
+						List<Person> peopleWithLastname = phonebook.findPeopleWithLastName(lastNameToFind);
 						
-						if(personFromLastname != null) {
-							System.out.println(personFromLastname);
+						if(peopleWithLastname != null) {
+							for(Person person : peopleWithLastname) {
+								System.out.println(person);
+							}
 						} else {
-							System.out.println("Couldn't find anyone with a last name of '" + lastName + "'");
+							System.out.println("Couldn't find anyone with a last name of '" + lastNameToFind + "'");
 						}
 						
 						break;
@@ -100,30 +102,32 @@ public class Main {
 						
 						break;
 					case 3:
-						System.out.print("Please enter a first name to search for: ");
-						String personFirstName = "";
+						System.out.print("Please enter the person's first and last names separated by a space: ");
+						String personFullName = "";
 						try {
-							personFirstName = br.readLine().trim();
+							personFullName = br.readLine().trim();
 						} catch (IOException ioe) {
 							System.err.println("IO error trying to read your choice!");
 							System.exit(1);
 						}
 						
-						System.out.print("Please enter a last name to search for: ");
-						String personLastName = "";
-						try {
-							personLastName = br.readLine().trim();
-						} catch (IOException ioe) {
-							System.err.println("IO error trying to read your choice!");
-							System.exit(1);
+						if(personFullName == null || personFullName == "") {
+							System.err.println("invalid name, try again");
 						}
 						
-						List<PhoneNumber> phoneNumbersFromPerson = phonebook.findPhoneNumbersOfPerson(new Person(personFirstName, personLastName));
+						String firstName = personFullName.split(" ")[0];
+						String lastName = personFullName.split(" ")[1];
 						
-						if(phoneNumbersFromPerson != null) {
-							System.out.println(phoneNumbersFromPerson);
+						List<Person> matchingPeople = phonebook.findPhoneNumbersOfPerson(new Person(firstName, lastName));
+						
+						if(matchingPeople != null) {
+							for(Person person : matchingPeople) {
+								System.out.println(person.getFirstName() + " " + person.getLastName() + ":");
+								System.out.println("\t" + person.getPhoneNumbers() + "\n");
+							}
+							
 						} else {
-							System.out.println("Couldn't find anyone matching '" + personFirstName + " " + personLastName + "'");
+							System.out.println("Couldn't find anyone matching '" + firstName + " " + lastName + "'");
 						}
 						
 						break;

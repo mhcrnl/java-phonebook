@@ -43,16 +43,23 @@ public class Phonebook extends ArrayList<Person> implements Serializable {
 		}
 	}
 
-	public Person findPersonWithLastName(String lastname) {
-		return searchablePhonebook.get(lastname.trim().toLowerCase());
+	public List<Person> findPeopleWithLastName(String lastname) {
+		List<Person> people = new ArrayList<Person>();
+		people.add(searchablePhonebook.get(lastname.trim().toLowerCase()));
+		return people;
 	}
 
 	public Person findPersonWithPhoneNumber(PhoneNumber phoneNumber) {
 		return searchablePhonebook.get(phoneNumber.toString().trim().replaceAll("\\D", ""));
 	}
 
-	public List<PhoneNumber> findPhoneNumbersOfPerson(Person person) {
-		return searchablePhonebook.get(person.getFirstName().trim().toLowerCase() + person.getLastName().trim().toLowerCase()).getPhoneNumbers();
+	public List<Person> findPhoneNumbersOfPerson(Person person) {
+		List<Person> people = new ArrayList<Person>();
+		people.add(searchablePhonebook.get(
+				person.getFirstName().trim().toLowerCase() + 
+				person.getLastName().trim().toLowerCase()
+		));
+		return people;
 	}
 	
 	// public static methods
