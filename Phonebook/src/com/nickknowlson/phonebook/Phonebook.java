@@ -9,17 +9,23 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.io.Serializable;
 
+// I think I am going to try a structure that will enable quick 
+// searching at the expense of taking up some extra memory
 public class Phonebook extends ArrayList<Person> implements Serializable {
 	
 	private static final long serialVersionUID = -6824316704912481869L;
 
-	// constructor
+	private HashMap<String, Person> searchablePhonebook = null;
+	
+	// constructors
 	public Phonebook(Collection<Person> listOfPeople) {
 		super(listOfPeople);
+		searchablePhonebook = createSearchablePhonebookFromPersonList(listOfPeople); 
 	}
 	
 	// public methods
@@ -37,30 +43,27 @@ public class Phonebook extends ArrayList<Person> implements Serializable {
 		}
 	}
 
-	public Person findPersonWithLastName(String string) {
-		// TODO Auto-generated method stub
-		return null;
+	public Person findPersonWithLastName(String lastname) {
+		return searchablePhonebook.get(lastname.trim().toLowerCase());
 	}
 
 	public Person findPersonWithPhoneNumber(PhoneNumber phoneNumber) {
-		// TODO Auto-generated method stub
-		return null;
+		return searchablePhonebook.get(phoneNumber.toString().trim().replaceAll("\\D", ""));
 	}
 
 	public List<PhoneNumber> findPhoneNumbersOfPerson(Person person) {
-		// TODO Auto-generated method stub
-		return null;
+		return searchablePhonebook.get(person.getFirstName().trim().toLowerCase() + person.getLastName().trim().toLowerCase()).getPhoneNumbers();
 	}
 	
 	// public static methods
-	public static List<Person> generateRandomizedListOfPeople(int amountOfPeople) {
+	public static Phonebook generateRandomizedPhonebook(int amountOfPeople) {
 		List<Person> randomListOfPeople = new ArrayList<Person>();
 		
 		for(int i=0; i < 5000; i++) {
 			randomListOfPeople.add(generateRandomPerson());
 		}
 		
-		return randomListOfPeople;
+		return new Phonebook(randomListOfPeople);
 	}
 	
 	public static Phonebook load(String filename) {
@@ -84,7 +87,7 @@ public class Phonebook extends ArrayList<Person> implements Serializable {
 		return new Phonebook(phonebook);
 	}
 	
-	// private methods
+	// private static methods
 	private static Person generateRandomPerson() {
 		String firstName = randomName();
 		String lastName = randomName();
@@ -136,6 +139,19 @@ public class Phonebook extends ArrayList<Person> implements Serializable {
 	private static String capitalizeWord(String word) {
 		return word.substring(0,1).toUpperCase() + word.toLowerCase().substring(1);
 	}
-
+	
+	private static HashMap<String, Person> createSearchablePhonebookFromPersonList(Iterable<Person> listOfPeople) {
+		HashMap<String, Person> randomMapOfPeople = new HashMap<String, Person>();
+		
+		for(Person person : listOfPeople) {
+			randomMapOfPeople.put(person.getLastName().trim().toLowerCase(), person);
+			for(PhoneNumber phoneNumber : person.getPhoneNumbers()) {
+				randomMapOfPeople.put(phoneNumber.toString().trim().replaceAll("\\D", ""), person);
+			}
+			randomMapOfPeople.put(person.getFirstName().trim().toLowerCase() + person.getLastName().trim().toLowerCase(), person);
+		}
+		
+		return randomMapOfPeople;
+	}
 	
 }

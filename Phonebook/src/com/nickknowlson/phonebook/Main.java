@@ -18,12 +18,16 @@ public class Main {
 		 
 		int number = 0;
 		
+		Phonebook phonebook;
+		
 		if(!phonebookExists()) {
 			System.out.println("No phonebook found, generating default phonebook.");
-			generatePhonebook();
+			phonebook = generatePhonebook();
+		} else {
+			phonebook = Phonebook.load(DEFAULT_PHONEBOOK_NAME);
 		}
 		
-		Phonebook phonebook = Phonebook.load(DEFAULT_PHONEBOOK_NAME);
+		 
 
 		while(number != 3) {
 			System.out.println("Pick an option: \n\t1. Generate new phonebook \n\t2. Look up a person\n\t3. Exit");
@@ -43,7 +47,7 @@ public class Main {
 			switch (number) {
 			case 1:
 				System.out.println("Generating phonebook...");
-				generatePhonebook();
+				phonebook = generatePhonebook();
 				break;
 			case 2:
 				while(number != 4) {
@@ -58,13 +62,70 @@ public class Main {
 					}
 					switch (number) {
 					case 1:
-						//Person mysteryJones = phonebook.findPersonWithLastName("Jones");
+						System.out.print("Please enter a last name to search for: ");
+						String lastName = "";
+						try {
+							lastName = br.readLine().trim();
+						} catch (IOException ioe) {
+							System.err.println("IO error trying to read your choice!");
+							System.exit(1);
+						}
+						
+						Person personFromLastname = phonebook.findPersonWithLastName(lastName);
+						
+						if(personFromLastname != null) {
+							System.out.println(personFromLastname);
+						} else {
+							System.out.println("Couldn't find anyone with a last name of '" + lastName + "'");
+						}
+						
 						break;
 					case 2:
-						//Person unknownPhoneNumber = phonebook.findPersonWithPhoneNumber(new PhoneNumber("12503342345"));
+						System.out.print("Please enter a phone number to search for: ");
+						String phoneNumber = "";
+						try {
+							phoneNumber = br.readLine().trim();
+						} catch (IOException ioe) {
+							System.err.println("IO error trying to read your choice!");
+							System.exit(1);
+						}
+						
+						Person personFromPhoneNumber = phonebook.findPersonWithPhoneNumber(new PhoneNumber(phoneNumber));
+						
+						if(personFromPhoneNumber != null) {
+							System.out.println(personFromPhoneNumber);
+						} else {
+							System.out.println("Couldn't find anyone with a phone number of '" + phoneNumber + "'");
+						}
+						
 						break;
 					case 3:
-						//List<PhoneNumber> janeDoesDigits = phonebook.findPhoneNumbersOfPerson(new Person("Jane", "Doe"));
+						System.out.print("Please enter a first name to search for: ");
+						String personFirstName = "";
+						try {
+							personFirstName = br.readLine().trim();
+						} catch (IOException ioe) {
+							System.err.println("IO error trying to read your choice!");
+							System.exit(1);
+						}
+						
+						System.out.print("Please enter a last name to search for: ");
+						String personLastName = "";
+						try {
+							personLastName = br.readLine().trim();
+						} catch (IOException ioe) {
+							System.err.println("IO error trying to read your choice!");
+							System.exit(1);
+						}
+						
+						List<PhoneNumber> phoneNumbersFromPerson = phonebook.findPhoneNumbersOfPerson(new Person(personFirstName, personLastName));
+						
+						if(phoneNumbersFromPerson != null) {
+							System.out.println(phoneNumbersFromPerson);
+						} else {
+							System.out.println("Couldn't find anyone matching '" + personFirstName + " " + personLastName + "'");
+						}
+						
 						break;
 					case 4:	break;
 					default:
@@ -87,8 +148,8 @@ public class Main {
 		return new File(DEFAULT_PHONEBOOK_NAME).exists();
 	}
 
-	private static void generatePhonebook() {
-		Phonebook phonebook = new Phonebook(Phonebook.generateRandomizedListOfPeople(5000));
+	private static Phonebook generatePhonebook() {
+		Phonebook phonebook = Phonebook.generateRandomizedPhonebook(5000);
 
 		System.out.println("Sample:");
 		for(int i=0; i < 5; i++) {
@@ -97,6 +158,7 @@ public class Main {
 		System.out.println();
 		
 		phonebook.save(DEFAULT_PHONEBOOK_NAME);
+		return phonebook;
 	}
 
 	
